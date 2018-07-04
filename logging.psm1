@@ -1,5 +1,7 @@
 # This is a library for standize the logging 
 
+
+
 # logging function
 function log-info()
 {
@@ -20,7 +22,7 @@ function log-info()
 	
 	if (!$app)
 	{
-		$app = "UnknownApp"
+		$app = "-"
 	}
 	
 	if (!$SessionID)
@@ -33,7 +35,7 @@ function log-info()
 	if ($logfile) 
 	{
 		$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"		
-		$logstring =  "$CurrentDateTime $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [INFO] : $logstring"
+		$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [INFO] : $logstring"
 		$logstring | out-file -Filepath $logfile -append -encoding ASCII
 	}	
 }
@@ -60,7 +62,7 @@ function log-error()
 	
 	if (!$app)
 	{
-		$app = "UnknownApp"
+		$app = "-"
 	}
 		
 	if (!$SessionID)
@@ -73,7 +75,7 @@ function log-error()
 	if ($logfile) 
 	{
 		$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"
-		$logstring =  "$CurrentDateTime $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [ERROR] : $logstring"
+		$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [ERROR] : $logstring"
 		$logstring | out-file -Filepath $logfile -append -encoding ASCII
 		
 	}
@@ -87,11 +89,10 @@ function log-debug()
 		[string]$logfile = $env:logfile,
 		[string]$color,
 		[string]$app = $env:app,
-		[string]$SessionID = $env:SessionID,
-		[string]$debug			
+		[string]$SessionID = $env:SessionID	
     )   
 	
-	if (($debug) -and ($debug -ne "SilentlyContinue"))
+	if ($DebugPreference -ne "SilentlyContinue")
 	{
 		if (!$logstring) 
 		{ 
@@ -101,7 +102,7 @@ function log-debug()
 	
 		if (!$app)
 		{
-			$app = "UnknownApp"
+			$app = "-"
 		}
 		
 		if (!$SessionID)
@@ -114,7 +115,7 @@ function log-debug()
 		if ($logfile) 
 		{
 			$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"
-			$logstring =  "$CurrentDateTime $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [DEBUG] : $logstring"
+			$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [DEBUG] : $logstring"
 			$logstring | out-file -Filepath $logfile -append -encoding ASCII
 		}	
 	}
