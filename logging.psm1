@@ -1,11 +1,13 @@
 # This is a library for standize the logging 
 
+
+
 # logging function
-function log()
+function log-info()
 {
 	Param  
     (                 
-		[string]$logstring,
+        [alias("message")][string]$logstring,
 		[string]$logfile = $env:logfile,
 		[string]$color,
 		[string]$app = $env:app,
@@ -20,12 +22,12 @@ function log()
 	
 	if (!$app)
 	{
-		$app = "UnknownApp"
+		$app = "-"
 	}
 	
 	if (!$SessionID)
 	{
-		$SessionID = "n/a"
+		$SessionID = "-"
 	}
 	
 	if (!$color) {$color = "white"}
@@ -33,16 +35,19 @@ function log()
 	if ($logfile) 
 	{
 		$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"		
-		$logstring =  "$CurrentDateTime $env:computername $app [" + $sessionID + "] [INFO] : $logstring"
+		$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [INFO] : $logstring"
 		$logstring | out-file -Filepath $logfile -append -encoding ASCII
 	}	
 }
+
+# Set an alias for backward compability 
+Set-Alias -Name log -Value log-info
 
 function log-error()
 {
 	Param  
     (                 
-		[string]$logstring,
+		[alias("message")][string]$logstring,
 		[string]$logfile = $env:logfile,
 		[string]$color,
 		[string]$app = $env:app,
@@ -57,12 +62,12 @@ function log-error()
 	
 	if (!$app)
 	{
-		$app = "UnknownApp"
+		$app = "-"
 	}
 		
 	if (!$SessionID)
 	{
-		$SessionID = "n/a"
+		$SessionID = "-"
 	}
 	
 	if (!$color) {$color = "Red"}
@@ -70,11 +75,52 @@ function log-error()
 	if ($logfile) 
 	{
 		$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"
-		$logstring =  "$CurrentDateTime $env:computername $app [" + $sessionID + "] [ERROR] : $logstring"
+		$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [ERROR] : $logstring"
 		$logstring | out-file -Filepath $logfile -append -encoding ASCII
 		
 	}
 }
+
+function log-debug()
+{
+	Param  
+    (                 
+		[alias("message")][string]$logstring,
+		[string]$logfile = $env:logfile,
+		[string]$color,
+		[string]$app = $env:app,
+		[string]$SessionID = $env:SessionID	
+    )   
+	
+	if ($DebugPreference -ne "SilentlyContinue")
+	{
+		if (!$logstring) 
+		{ 
+			write-host "Error!!! no log is passed to the logging function" -foregroundcolor red
+			return
+		}
+	
+		if (!$app)
+		{
+			$app = "-"
+		}
+		
+		if (!$SessionID)
+		{
+			$SessionID = "-"
+		}
+	
+		if (!$color) {$color = "Yellow"}
+		write-host $logstring -foregroundcolor $color
+		if ($logfile) 
+		{
+			$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"
+			$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [DEBUG] : $logstring"
+			$logstring | out-file -Filepath $logfile -append -encoding ASCII
+		}	
+	}
+}
+
 
 function logrotate ()
 {
