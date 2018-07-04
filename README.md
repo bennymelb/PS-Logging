@@ -14,7 +14,7 @@ Apart from the log function above, it also provide a log rotation and log archiv
 
 To use this library, you need to either place it into the default powershell module path $env:PSModulePath or you have to add the path where this module reside to the $env:PSModulePath like this
 
-...
+```
 Param (
 
     # Set the working directory
@@ -35,6 +35,6 @@ $env:PSModulePath = $env:PSModulePath + ";$lib"
 # Load the logging module
 Import-Module logging.psm1 -ErrorAction Stop
 
-...
+```
 
 The .psm file will have to be place inside a folder
