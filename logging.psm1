@@ -1,23 +1,5 @@
 # This is a library for standize the logging 
 
-# function to construct the header
-function Make-Header ()
-{
-    Param (
-        [string]$Priority,
-        [string]$Version,
-        [string]$Timestamp,
-        [string]$Hostname,
-        [string]$App,
-        [string]$ProcID,
-        [string]$MsgID
-    )
-
-    #https://stackify.com/syslog-101/
-    #http://www.monitorware.com/common/en/articles/syslog-described.php
-    
-}
-
 # logging function
 function log-info()
 {
