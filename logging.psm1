@@ -1,6 +1,22 @@
 # This is a library for standize the logging 
 
+# function to construct the header
+function Make-Header ()
+{
+    Param (
+        [string]$Priority,
+        [string]$Version,
+        [string]$Timestamp,
+        [string]$Hostname,
+        [string]$App,
+        [string]$ProcID,
+        [string]$MsgID
+    )
 
+    #https://stackify.com/syslog-101/
+    #http://www.monitorware.com/common/en/articles/syslog-described.php
+    
+}
 
 # logging function
 function log-info()
@@ -122,7 +138,7 @@ function log-debug()
 }
 
 
-function logrotate ()
+function log-rotate ()
 {
     Param (
         [String]$logfile = $env:logfile,
@@ -137,6 +153,23 @@ function logrotate ()
     }
     else 
     {
+        # Check the old log folder and create it if it doesn't exist
+        if (!(Test-Path -PathType Container $oldlogfolder))
+        {
+            write-host "$oldlogfolder does not exist, creating it..."
+            New-Item -ItemType Directory -Path $oldlogfolder -ErrorVariable err
+            if ($err)
+            {
+                Write-Warning "Error!!! Failed to create $oldlogfile"
+                Write-Warning "$err"
+                Return 1                
+            }
+            else 
+            {
+                Write-host "Successfully created $oldlogfolder"    
+            }
+        }
+        
         # Get the last modify date of the logfile
         $lastmodify = (Get-ItemProperty -Path $logfile).LastWriteTime
     
@@ -207,13 +240,15 @@ function logrotate ()
         }
     }
 }
+# Set an alias for backward compability 
+Set-Alias -Name logrotate -Value Log-Rotate
 
 # Function to Archive the log
-function LogArchive () 
+function Log-Archive () 
 {
     Param (
         [string]$Source,
-        [string]$Destination,
+        [alias("Archive")][string]$Destination,
         [int16]$LogRetention = $env:LogRetention
     )    
 
@@ -266,7 +301,7 @@ function LogArchive ()
         }
         else 
         {
-            # Check the folder if it doesn't exist
+            # Check the folder and create it if it doesn't exist
             $ArchiveFilePath = Split-Path $Destination
             If (!(Test-Path -PathType Container $ArchiveFilePath))
             {
@@ -289,7 +324,7 @@ function LogArchive ()
         # Passed all validation, start the log archive process
 
         # Build an array of all file that needs to be archive
-        $ArchiveFileArr = Get-ChildItem -File $Source | where { $_.LastWriteTime -lt (Get-Date).AddDays(-$Logretention)}
+        $ArchiveFileArr = Get-ChildItem -File $Source | Where-Object { $_.LastWriteTime -lt (Get-Date).AddDays(-$Logretention)}
         Foreach ($File in $ArchiveFileArr)
         {
             $FileToAdd = $File.FullName
@@ -302,3 +337,6 @@ function LogArchive ()
         }        
     }
 }
+# Set an alias for backward compability 
+Set-Alias -Name logarchive -Value Log-Archive
+
