@@ -37,4 +37,4 @@ Import-Module logging.psm1 -ErrorAction Stop
 
 ```
 
-The .psm file will have to be place inside a folder
+The .psm file will have to be place inside a folder in the $env:PSModulePath
