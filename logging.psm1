@@ -54,7 +54,7 @@ function log-error()
     
 	if (!$logstring) 
 	{ 
-		write-host "Error!!! no log is passed to the logging function" -foregroundcolor red
+		write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
 		return
 	}
 	
@@ -94,7 +94,7 @@ function log-debug()
 	{
 		if (!$logstring) 
 		{ 
-			write-host "Error!!! no log is passed to the logging function" -foregroundcolor red
+			write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
 			return
 		}
 	
