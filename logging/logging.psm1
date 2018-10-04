@@ -1,4 +1,6 @@
-# This is a library for standize the logging 
+# This is a library for standize the logging to RFC5424 format
+# https://tools.ietf.org/html/rfc5424.html
+
 
 # logging function
 function log-info()
