@@ -11,9 +11,17 @@ function log-info()
 		[string]$logfile = $env:logfile,
 		[string]$color,
 		[string]$app = $env:app,
-		[string]$SessionID = $env:SessionID
+        [string]$SessionID = $env:SessionID,
+        [int16]$Facility = 16 #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
     )   
-	
+    
+    # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+    $Severity = 6
+    $Version = 1
+
+    # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
+    $Priority = '<' + ($Facility * 8) + $Severity + '>'
+
 	if (!$logstring) 
 	{ 
 		write-host "Error!!! no log is passed to the logging function" -foregroundcolor red
@@ -34,8 +42,9 @@ function log-info()
 	write-host $logstring -foregroundcolor $color
 	if ($logfile) 
 	{
-		$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"		
-		$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [INFO] : $logstring"
+        $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
+        $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
+		$logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [INFO] - $logstring"
 		$logstring | out-file -Filepath $logfile -append -encoding ASCII
 	}	
 }
@@ -51,9 +60,16 @@ function log-error()
 		[string]$logfile = $env:logfile,
 		[string]$color,
 		[string]$app = $env:app,
-		[string]$SessionID = $env:SessionID				
+        [string]$SessionID = $env:SessionID,
+        [int16]$Facility = 16 #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1				
     )   
-    
+    # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+    $Severity = 3
+    $Version = 1
+
+    # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
+    $Priority = '<' + ($Facility * 8) + $Severity + '>'
+
 	if (!$logstring) 
 	{ 
 		write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
@@ -74,8 +90,9 @@ function log-error()
 	write-host $logstring -foregroundcolor $color
 	if ($logfile) 
 	{
-		$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"
-		$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [ERROR] : $logstring"
+		$CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
+        $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
+		$logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [ERROR] - $logstring"
 		$logstring | out-file -Filepath $logfile -append -encoding ASCII
 		
 	}
@@ -89,9 +106,17 @@ function log-debug()
 		[string]$logfile = $env:logfile,
 		[string]$color,
 		[string]$app = $env:app,
-		[string]$SessionID = $env:SessionID	
+        [string]$SessionID = $env:SessionID,
+        [int16]$Facility = 16 #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1	
     )   
-	
+
+    # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+    $Severity = 7
+    $Version = 1
+
+    # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
+    $Priority = '<' + ($Facility * 8) + $Severity + '>'
+
 	if ($DebugPreference -ne "SilentlyContinue")
 	{
 		if (!$logstring) 
@@ -114,8 +139,9 @@ function log-debug()
 		write-host $logstring -foregroundcolor $color
 		if ($logfile) 
 		{
-			$CurrentDateTime = get-date -format "MMM dd yyyy HH:mm:ss"
-			$logstring =  "$CurrentDateTime $($([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname) $app [" + $sessionID + "] [DEBUG] : $logstring"
+            $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
+            $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
+            $logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [DEBUG] - $logstring"
 			$logstring | out-file -Filepath $logfile -append -encoding ASCII
 		}	
 	}
