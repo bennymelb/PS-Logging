@@ -20,7 +20,8 @@ function log-info()
     $Version = 1
 
     #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    If (!$Facility){
+    If (!$Facility)
+    {
         $Facility = 16
     }
 
@@ -30,7 +31,7 @@ function log-info()
 	if (!$logstring) 
 	{ 
 		write-host "Error!!! no log is passed to the logging function" -foregroundcolor red
-		return
+		return 1
 	}
 	
 	if (!$app)
@@ -50,8 +51,15 @@ function log-info()
         $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
         $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
 		$logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [INFO] - $logstring"
-		$logstring | out-file -Filepath $logfile -append -encoding ASCII
-	}	
+        $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
+        if ($err)
+        {
+            write-host "Error!!! failed to write the log to $logfile"
+            write-host "$err"
+            return 1
+        }
+    }	
+    return 0
 }
 
 # Set an alias for backward compability 
@@ -73,7 +81,8 @@ function log-error()
     $Version = 1
 
     #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    If (!$Facility){
+    If (!$Facility)
+    {
         $Facility = 16
     }
 
@@ -83,7 +92,7 @@ function log-error()
 	if (!$logstring) 
 	{ 
 		write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
-		return
+		return 1
 	}
 	
 	if (!$app)
@@ -102,10 +111,16 @@ function log-error()
 	{
 		$CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
         $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
-		$logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [ERROR] - $logstring"
-		$logstring | out-file -Filepath $logfile -append -encoding ASCII
-		
-	}
+		$logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [ERROR] - $logstring"        
+        $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
+        if ($err)
+        {
+            write-host "Error!!! failed to write the log to $logfile"
+            write-host "$err"
+            return 1
+        }
+    }	
+    return 0
 }
 
 function log-debug()
@@ -125,7 +140,8 @@ function log-debug()
     $Version = 1
 
     #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    If (!$Facility){
+    If (!$Facility)
+    {
         $Facility = 16
     }
 
@@ -137,7 +153,7 @@ function log-debug()
 		if (!$logstring) 
 		{ 
 			write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
-			return
+			return 1
 		}
 	
 		if (!$app)
@@ -157,8 +173,15 @@ function log-debug()
             $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
             $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
             $logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [DEBUG] - $logstring"
-			$logstring | out-file -Filepath $logfile -append -encoding ASCII
-		}	
+            $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
+            if ($err)
+            {
+                write-host "Error !!! failed to write the log to $logfile"
+                write-host "$err"
+                return 1
+            }
+        }
+        return 0	
 	}
 }
 
@@ -174,7 +197,7 @@ function log-rotate ()
     If (!(Test-Path $logfile))
     {
         Write-host "$logfile does not exist, skipping the logrotate"
-        Return 1
+        return 1
     }
     else 
     {
@@ -187,7 +210,7 @@ function log-rotate ()
             {
                 Write-Warning "Error!!! Failed to create $oldlogfile"
                 Write-Warning "$err"
-                Return 1                
+                return 1                
             }
             else 
             {
@@ -233,9 +256,8 @@ function log-rotate ()
                             if ($err)
                             {
                                 Write-Warning "Failed to rotate $FileToRotate"
-                                Write-Warning "$err"
-                                Write-Warning "This is a fatal error, exiting the script..."
-                                Exit 1
+                                Write-Warning "$err"         
+                                return 1
                             }
                         }
                         $Counter--
@@ -247,8 +269,7 @@ function log-rotate ()
                 {
                     Write-Warning "Failed to Rotate $oldlogfile"
                     Write-Warning "$err"
-                    Write-Warning "This is a fatal error, exiting the script..."
-                    Exit 1
+                    return 1
                 }
             }
             Rename-Item -LiteralPath $logfile -NewName $Oldlogfile
@@ -256,11 +277,13 @@ function log-rotate ()
             if (!$err)
             {
                 write-host "Successfully rotated the $logfile to $oldlogfolder\$oldlogfile"
+                return 0
             }
             else 
             {
                 Write-Warning "Failed to rotate $logfile"
                 Write-Warning "$err" 
+                return 1
             }
         }
     }
@@ -281,6 +304,7 @@ function Log-Archive ()
     If (!(Test-Path $Source))
     {
         Write-Warning "Error!!! $Source does not exist, not going ahead with the archive process"
+        return 1
     }
     else 
     {
@@ -294,14 +318,14 @@ function Log-Archive ()
             $ErrMsg = $_.Exception.Message
             Write-Warning "$ErrMsg"
             Write-Warning "$Source is not a valid path, exiting the log archive process"
-            Return 1                   
+            return 1                   
         }
         # Check if source is a file or folder
         $SourcFolderExtenstion = $SourceFolder.Extension
         If ($SourcFolderExtenstion)
         {
             Write-Warning "Error!!! $Source is a file, it needs to be a folder, not going ahead with the log archive process"
-            Return 1
+            return 1
         }
 
         # validate the destination
@@ -314,7 +338,7 @@ function Log-Archive ()
             $ErrMsg = $_.Exception.Message
             Write-Warning "$ErrMsg"
             Write-Warning "$Destination is not a valid path, exiting the log archive process"
-            Return 1
+            return 1
         }
         
         # Check if destination is a file or folder
@@ -322,7 +346,7 @@ function Log-Archive ()
         If (!$ArchiveFileExtension)
         {
             Write-Warning "Error!!! $Destination is a folder, it needs to be a file, not going ahead with the log archive process"
-            Return 1
+            return 1
         }
         else 
         {
@@ -337,7 +361,7 @@ function Log-Archive ()
                     Write-Warning "Error!!! Failed to create $ArchiveFilePath"
                     Write-Warning "$err"
                     Write-Warning "This is a fatal error, exiting the log Archive process..."
-                    Return 1
+                    return 1
                 }
                 else 
                 {
@@ -357,9 +381,11 @@ function Log-Archive ()
             if ($err)
             {
                 Write-Warning "Failed to archive $FileToAdd to $Destination"
+                return 1
             }
             Remove-Item -Force -Path $FileToAdd
         }        
+        return 0
     }
 }
 # Set an alias for backward compability 
