@@ -12,15 +12,20 @@ function log-info()
 		[string]$color,
 		[string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
-        [int16]$Facility = 16 #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        [int16]$Facility = $env:facility
     )   
     
     # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
     $Severity = 6
     $Version = 1
 
+    #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+    If (!$Facility){
+        $Facility = 16
+    }
+
     # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
-    $Priority = '<' + ($Facility * 8) + $Severity + '>'
+    $Priority = '<' + (($Facility * 8) + $Severity) + '>'
 
 	if (!$logstring) 
 	{ 
@@ -61,14 +66,19 @@ function log-error()
 		[string]$color,
 		[string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
-        [int16]$Facility = 16 #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1				
+        [int16]$Facility = $env:Facility
     )   
     # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
     $Severity = 3
     $Version = 1
 
+    #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+    If (!$Facility){
+        $Facility = 16
+    }
+
     # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
-    $Priority = '<' + ($Facility * 8) + $Severity + '>'
+    $Priority = '<' + (($Facility * 8) + $Severity) + '>'
 
 	if (!$logstring) 
 	{ 
@@ -107,15 +117,20 @@ function log-debug()
 		[string]$color,
 		[string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
-        [int16]$Facility = 16 #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1	
+        [int16]$Facility = $env:Facility
     )   
 
     # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
     $Severity = 7
     $Version = 1
 
+    #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+    If (!$Facility){
+        $Facility = 16
+    }
+
     # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
-    $Priority = '<' + ($Facility * 8) + $Severity + '>'
+    $Priority = '<' + (($Facility * 8) + $Severity) + '>'
 
 	if ($DebugPreference -ne "SilentlyContinue")
 	{
