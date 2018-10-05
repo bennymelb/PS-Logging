@@ -39,7 +39,27 @@ function log-info()
 	
 	    if (!$app)
 	    {
-		    $app = "-"
+            # check if the command is invoke inside the runspace (interactive powershell session) or external request
+            If ($MyInvocation.CommandOrigin -eq "Runspace")
+            {
+                # This is running directly from a powershell session
+                $app = "powershell-$($env:username)"
+            }
+            else
+            {   
+                # This is calling from another script
+                $app = $MyInvocation.ScriptName
+                if ($app)
+                {
+    	            # Set the name to the calling script name if this script is called from another script / function
+	                $app = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
+                }
+                else
+                {
+    	            # If we still cant get the calling script name, we just leave it as "-"
+                    $app = "-"
+                }
+            }            
 	    }
 	
 	    if (!$SessionID)
@@ -102,10 +122,30 @@ function log-error()
 		    return 1
 	    }
 	
-	    if (!$app)
+        if (!$app)
 	    {
-    		$app = "-"
-    	}
+            # check if the command is invoke inside the runspace (interactive powershell session) or external request
+            If ($MyInvocation.CommandOrigin -eq "Runspace")
+            {
+                # This is running directly from a powershell session
+                $app = "powershell-$($env:username)"
+            }
+            else
+            {   
+                # This is calling from another script
+                $app = $MyInvocation.ScriptName
+                if ($app)
+                {
+    	            # Set the name to the calling script name if this script is called from another script / function
+	                $app = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
+                }
+                else
+                {
+    	            # If we still cant get the calling script name, we just leave it as "-"
+                    $app = "-"
+                }
+            }            
+	    }
 		
     	if (!$SessionID)
 	    {   
@@ -167,9 +207,29 @@ function log-debug()
 		    }
 	
 		    if (!$app)
-		    {
-			    $app = "-"
-		    }
+	        {
+                # check if the command is invoke inside the runspace (interactive powershell session) or external request
+                If ($MyInvocation.CommandOrigin -eq "Runspace")
+                {
+                    # This is running directly from a powershell session
+                    $app = "powershell-$($env:username)"
+                }
+                else
+                {   
+                    # This is calling from another script
+                    $app = $MyInvocation.ScriptName
+                    if ($app)
+                    {
+    	                # Set the name to the calling script name if this script is called from another script / function
+	                    $app = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
+                    }
+                    else
+                    {
+    	                # If we still cant get the calling script name, we just leave it as "-"
+                        $app = "-"
+                    }
+                }            
+	        }
 		
     		if (!$SessionID)
 	    	{
