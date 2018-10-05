@@ -44,7 +44,7 @@ function log-info()
 	
 	    if (!$SessionID)
 	    {
-    		$SessionID = "-"
+    		$SessionID = $PID
     	}
 	
     	if (!$color) {$color = "white"}
@@ -109,7 +109,7 @@ function log-error()
 		
     	if (!$SessionID)
 	    {   
-    		$SessionID = "-"
+    		$SessionID = $pid
     	}
 	
     	if (!$color) {$color = "Red"}
@@ -173,7 +173,7 @@ function log-debug()
 		
     		if (!$SessionID)
 	    	{
-		    	$SessionID = "-"
+		    	$SessionID = $pid
 		    }
 	
 		    if (!$color) {$color = "Yellow"}
