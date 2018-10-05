@@ -5,61 +5,64 @@
 # logging function
 function log-info()
 {
-	Param  
+    [CmdletBinding()]
+    Param  
     (                 
         [alias("message")][string]$logstring,
 		[string]$logfile = $env:logfile,
 		[string]$color,
 		[string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
-        [int16]$Facility = $env:facility
+        [ValidateRange(0,23)][int16]$Facility = $env:facility
     )   
     
-    # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    $Severity = 6
-    $Version = 1
+    Process {
 
-    #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    If (!$Facility)
-    {
-        $Facility = 16
-    }
+        # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        $Severity = 6
+        $Version = 1
 
-    # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
-    $Priority = '<' + (($Facility * 8) + $Severity) + '>'
-
-	if (!$logstring) 
-	{ 
-		write-host "Error!!! no log is passed to the logging function" -foregroundcolor red
-		return 1
-	}
-	
-	if (!$app)
-	{
-		$app = "-"
-	}
-	
-	if (!$SessionID)
-	{
-		$SessionID = "-"
-	}
-	
-	if (!$color) {$color = "white"}
-	write-host $logstring -foregroundcolor $color
-	if ($logfile) 
-	{
-        $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
-        $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
-		$logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [INFO] - $logstring"
-        $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
-        if ($err)
+        #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        If (!$Facility)
         {
-            write-host "Error!!! failed to write the log to $logfile"
-            write-host "$err"
-            return 1
+            $Facility = 16
         }
-    }	
-    return 0
+
+        # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
+        $Priority = '<' + (($Facility * 8) + $Severity) + '>'
+
+	    if (!$logstring) 
+	    { 
+		    write-host "Error!!! no log is passed to the logging function" -foregroundcolor red
+		    return 1
+	    }
+	
+	    if (!$app)
+	    {
+		    $app = "-"
+	    }
+	
+	    if (!$SessionID)
+	    {
+    		$SessionID = "-"
+    	}
+	
+    	if (!$color) {$color = "white"}
+	    write-host $logstring -foregroundcolor $color
+	    if ($logfile) 
+	    {
+            $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
+            $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
+		    $logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [INFO] - $logstring"
+            $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
+            if ($err)
+            {
+                write-host "Error!!! failed to write the log to $logfile"
+                write-host "$err"
+                return 1
+            }
+        }	    
+    }
 }
 
 # Set an alias for backward compability 
@@ -67,6 +70,7 @@ Set-Alias -Name log -Value log-info
 
 function log-error()
 {
+    [CmdletBinding()]
 	Param  
     (                 
 		[alias("message")][string]$logstring,
@@ -74,57 +78,61 @@ function log-error()
 		[string]$color,
 		[string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
-        [int16]$Facility = $env:Facility
+        [ValidateRange(0,23)][int16]$Facility = $env:Facility
     )   
-    # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    $Severity = 3
-    $Version = 1
 
-    #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    If (!$Facility)
-    {
-        $Facility = 16
-    }
+    Process {
 
-    # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
-    $Priority = '<' + (($Facility * 8) + $Severity) + '>'
+        # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        $Severity = 3
+        $Version = 1
 
-	if (!$logstring) 
-	{ 
-		write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
-		return 1
-	}
-	
-	if (!$app)
-	{
-		$app = "-"
-	}
-		
-	if (!$SessionID)
-	{
-		$SessionID = "-"
-	}
-	
-	if (!$color) {$color = "Red"}
-	write-host $logstring -foregroundcolor $color
-	if ($logfile) 
-	{
-		$CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
-        $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
-		$logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [ERROR] - $logstring"        
-        $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
-        if ($err)
+        #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        If (!$Facility)
         {
-            write-host "Error!!! failed to write the log to $logfile"
-            write-host "$err"
-            return 1
+            $Facility = 16
         }
-    }	
-    return 0
+
+        # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
+        $Priority = '<' + (($Facility * 8) + $Severity) + '>'
+
+	    if (!$logstring) 
+	    { 
+    		write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
+		    return 1
+	    }
+	
+	    if (!$app)
+	    {
+    		$app = "-"
+    	}
+		
+    	if (!$SessionID)
+	    {   
+    		$SessionID = "-"
+    	}
+	
+    	if (!$color) {$color = "Red"}
+    	write-host $logstring -foregroundcolor $color
+    	if ($logfile) 
+    	{
+	    	$CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
+            $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
+		    $logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [ERROR] - $logstring"        
+            $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
+            if ($err)
+            {
+                write-host "Error!!! failed to write the log to $logfile"
+                write-host "$err"
+                return 1
+            }
+        }	
+    }
 }
 
 function log-debug()
 {
+    [CmdletBinding()]
 	Param  
     (                 
 		[alias("message")][string]$logstring,
@@ -132,56 +140,58 @@ function log-debug()
 		[string]$color,
 		[string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
-        [int16]$Facility = $env:Facility
+        [ValidateRange(0,23)][int16]$Facility = $env:Facility
     )   
 
-    # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    $Severity = 7
-    $Version = 1
+    Process {
+        
+        # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        $Severity = 7
+        $Version = 1
 
-    #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
-    If (!$Facility)
-    {
-        $Facility = 16
-    }
-
-    # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
-    $Priority = '<' + (($Facility * 8) + $Severity) + '>'
-
-	if ($DebugPreference -ne "SilentlyContinue")
-	{
-		if (!$logstring) 
-		{ 
-			write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
-			return 1
-		}
-	
-		if (!$app)
-		{
-			$app = "-"
-		}
-		
-		if (!$SessionID)
-		{
-			$SessionID = "-"
-		}
-	
-		if (!$color) {$color = "Yellow"}
-		write-host $logstring -foregroundcolor $color
-		if ($logfile) 
-		{
-            $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
-            $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
-            $logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [DEBUG] - $logstring"
-            $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
-            if ($err)
-            {
-                write-host "Error !!! failed to write the log to $logfile"
-                write-host "$err"
-                return 1
-            }
+        #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        If (!$Facility)
+        {
+            $Facility = 16
         }
-        return 0	
+
+        # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
+        $Priority = '<' + (($Facility * 8) + $Severity) + '>'
+
+	    if ($DebugPreference -ne "SilentlyContinue")
+	    {
+		    if (!$logstring) 
+		    { 
+			    write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
+			    return 1
+		    }
+	
+		    if (!$app)
+		    {
+			    $app = "-"
+		    }
+		
+    		if (!$SessionID)
+	    	{
+		    	$SessionID = "-"
+		    }
+	
+		    if (!$color) {$color = "Yellow"}
+		    write-host $logstring -foregroundcolor $color
+		    if ($logfile) 
+		    {
+                $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
+                $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
+                $logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [DEBUG] - $logstring"
+                $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
+                if ($err)
+                {
+                    write-host "Error !!! failed to write the log to $logfile"
+                    write-host "$err"
+                    return 1
+                }
+            }
+        }            
 	}
 }
 
