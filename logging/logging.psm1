@@ -183,8 +183,8 @@ function log-debug()
     (                 
 		[alias("message")][string]$logstring,
 		[string]$logfile = $env:logfile,
-		[string]$color,
-		[string]$app = $env:app,
+        [string]$color,
+        [string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
         [ValidateRange(0,23)][int16]$Facility = $env:Facility
     )   
