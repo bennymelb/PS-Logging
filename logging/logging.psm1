@@ -2,6 +2,36 @@
 # https://tools.ietf.org/html/rfc5424.html
 
 
+# function used by this module itself
+function SetAppName () 
+{
+    # check if the command is invoked inside a runspace (interactive powershell session) or external request
+    If ($MyInvocation.CommandOrigin -eq "Runspace")
+    {
+        # This is running directly from a powershell session
+        # Get the Parent PID 
+        $ppid = (Get-WmiObject win32_process | Where-Object processid -eq  $pid).parentprocessid
+        # Set the app name to the Process name of the Parent Pid
+        $appname = (Get-Process -Id $ppid).ProcessName                
+    }
+    else
+    {   
+        # This is run from a script
+        $appname = $MyInvocation.ScriptName
+        if ($appname)
+        {
+            # Set the name to the calling script name if this script is called from another script / function
+            $appname = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
+        }
+        else
+        {
+            # If we still cant get the calling script name, we just leave it as "-"
+            $appname = "powershell-$($env:username)"
+        }
+    }
+    Return $appname
+}
+
 # logging function
 function log-info()
 {
@@ -39,30 +69,7 @@ function log-info()
 	
 	    if (!$app)
 	    {
-            # check if the command is invoked inside a runspace (interactive powershell session) or external request
-            If ($MyInvocation.CommandOrigin -eq "Runspace")
-            {
-                # This is running directly from a powershell session
-                # Get the Parent PID 
-                $ppid = (Get-WmiObject win32_process | Where-Object processid -eq  $pid).parentprocessid
-                # Set the app name to the Process name of the Parent Pid
-                $app = (Get-Process -Id $ppid).ProcessName                
-            }
-            else
-            {   
-                # This is run from a script
-                $app = $MyInvocation.ScriptName
-                if ($app)
-                {
-    	            # Set the name to the calling script name if this script is called from another script / function
-	                $app = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
-                }
-                else
-                {
-    	            # If we still cant get the calling script name, we just leave it as "-"
-                    $app = "powershell-$($env:username)"
-                }
-            }            
+            $app = SetAppName     
 	    }
 	
 	    if (!$SessionID)
@@ -127,30 +134,7 @@ function log-error()
 	
         if (!$app)
 	    {
-            # check if the command is invoke inside the runspace (interactive powershell session) or external request
-            If ($MyInvocation.CommandOrigin -eq "Runspace")
-            {
-                # This is running directly from a powershell session
-                # Get the Parent PID 
-                $ppid = (Get-WmiObject win32_process | Where-Object processid -eq  $pid).parentprocessid
-                # Set the app name to the Process name of the Parent Pid
-                $app = (Get-Process -Id $ppid).ProcessName        
-            }
-            else
-            {   
-                # This is calling from another script
-                $app = $MyInvocation.ScriptName
-                if ($app)
-                {
-    	            # Set the name to the calling script name if this script is called from another script / function
-	                $app = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
-                }
-                else
-                {
-    	            # If we still cant get the calling script name, we just leave it as "-"
-                    $app = "-"
-                }
-            }            
+            $app = SetAppName                 
 	    }
 		
     	if (!$SessionID)
@@ -214,30 +198,7 @@ function log-debug()
 	
 		    if (!$app)
 	        {
-                # check if the command is invoke inside the runspace (interactive powershell session) or external request
-                If ($MyInvocation.CommandOrigin -eq "Runspace")
-                {
-                    # This is running directly from a powershell session
-                    # Get the Parent PID 
-                    $ppid = (Get-WmiObject win32_process | Where-Object processid -eq  $pid).parentprocessid
-                    # Set the app name to the Process name of the Parent Pid
-                    $app = (Get-Process -Id $ppid).ProcessName        
-                }
-                else
-                {   
-                    # This is calling from another script
-                    $app = $MyInvocation.ScriptName
-                    if ($app)
-                    {
-    	                # Set the name to the calling script name if this script is called from another script / function
-	                    $app = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
-                    }
-                    else
-                    {
-    	                # If we still cant get the calling script name, we just leave it as "-"
-                        $app = "-"
-                    }
-                }            
+                $app = SetAppName                 
 	        }
 		
     		if (!$SessionID)
