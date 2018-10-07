@@ -7,11 +7,11 @@ function log-info()
 {
     [CmdletBinding()]
     Param  
-    (                 
+    (
         [alias("message")][string]$logstring,
-		[string]$logfile = $env:logfile,
-		[string]$color,
-		[string]$app = $env:app,
+        [string]$logfile = $env:logfile,
+        [string]$color,
+        [string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
         [ValidateRange(0,23)][int16]$Facility = $env:facility
     )   
@@ -95,11 +95,11 @@ function log-error()
 {
     [CmdletBinding()]
 	Param  
-    (                 
-		[alias("message")][string]$logstring,
-		[string]$logfile = $env:logfile,
-		[string]$color,
-		[string]$app = $env:app,
+    (
+        [alias("message")][string]$logstring,
+        [string]$logfile = $env:logfile,
+        [string]$color,
+        [string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
         [ValidateRange(0,23)][int16]$Facility = $env:Facility
     )   
@@ -180,9 +180,9 @@ function log-debug()
 {
     [CmdletBinding()]
 	Param  
-    (                 
-		[alias("message")][string]$logstring,
-		[string]$logfile = $env:logfile,
+    (
+        [alias("message")][string]$logstring,
+        [string]$logfile = $env:logfile,
         [string]$color,
         [string]$app = $env:app,
         [string]$SessionID = $env:SessionID,
