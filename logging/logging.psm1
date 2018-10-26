@@ -88,9 +88,6 @@ function log-info()
     }
 }
 
-# Set an alias for backward compability 
-Set-Alias -Name log -Value log-info
-
 function log-error()
 {
     [CmdletBinding()]
@@ -455,8 +452,6 @@ function log-rotate ()
         }
     }
 }
-# Set an alias for backward compability 
-Set-Alias -Name logrotate -Value Log-Rotate
 
 # Function to Archive the log
 function Log-Archive () 
@@ -555,6 +550,11 @@ function Log-Archive ()
         return 0
     }
 }
-# Set an alias for backward compability 
-Set-Alias -Name logarchive -Value Log-Archive
 
+# Set an alias for backward compability 
+Set-Alias -Name log -Value log-info
+Set-Alias -Name logarchive -Value Log-Archive
+Set-Alias -Name logrotate -Value Log-Rotate
+
+# Export only the necessary function and Alias
+Export-ModuleMember -Function log-info, log-error, log-debug, log-verbose, log-archive, log-rotate -Alias log, logarchive, logrotate
