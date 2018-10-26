@@ -12,7 +12,7 @@ Each log level will inject a tag inside the log line to indicate the log level.
 Apart from the log function above, it also provide a log rotation (log-rotate) and log archive (log-archive) function. The log archive function uses Compress-Archive cmdlet which is only available in powershell 5.0 and above. 
 
 Log-Rotate:
-This function only support daily rotation for now and require the location of the logfile you wanted to rotate as well as the folder name of where you want to rotated (old) log reside on. The rotated log will have a ddMMyyyy prefix to it. If the old log foler has a file with the same name, it will automatically rename the duplicated file with a counter at the end, this counter goes up to 999 and after that it will be over written. The lower the counter number means the log is newer. 
+This function only support daily rotation for now and require the location of the logfile you wanted to rotate as well as the folder name of where you want to rotated (old) log reside on. The rotated log will have a ddMMyyyy prefix to it. If the old log folder has a file with the same name, it will automatically rename the duplicated file with a counter at the end, this counter goes up to 999 and after that it will be over written. The lower the counter number means the log is newer. 
 
 Log-Archive:
 This function scan a folder you specify (sourcefolder) and will pack all file within that folder that falls into the retention ($env:LogRetention) you specify into a archive file using the Compress-Archive cmdlet. It also require you to specify the name of the archived file (Destination)
