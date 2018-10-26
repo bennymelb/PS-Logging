@@ -264,6 +264,94 @@ function log-debug()
 	}
 }
 
+function log-verbose()
+{
+    [CmdletBinding()]
+	Param  
+    (
+        [alias("message")][string]$logstring,
+        [string]$logfile = $env:logfile,
+        [string]$color,
+        [string]$app = $env:app,
+        [string]$SessionID = $env:SessionID,
+        [ValidateRange(0,23)][int16]$Facility = $env:Facility
+    )   
+
+    Process {
+        
+        # Set the Severity level https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        $Severity = 7
+        $Version = 1
+
+        #If no facility is passed into the function we use local0 for the default https://tools.ietf.org/html/rfc5424.html#section-6.2.1
+        If (!$Facility)
+        {
+            $Facility = 16
+        }
+
+        # Calculate the priority, The Priority value is calculated by first multiplying the Facility number by 8 and then adding the numerical value of the Severity. 
+        $Priority = '<' + (($Facility * 8) + $Severity) + '>'
+
+	    if ($VerbosePreference -ne "SilentlyContinue")
+	    {
+		    if (!$logstring) 
+		    { 
+			    write-host "Error!!! no log is passed to the logging function" -foregroundcolor $color
+			    return 1
+		    }
+	
+		    if (!$app)
+	        {
+                # check if the command is invoked inside a runspace (interactive powershell session) or external request (call from a script)
+                If ($MyInvocation.CommandOrigin -eq "Runspace")
+                {
+                    # This is running directly from a powershell session
+                    # Get the Parent PID 
+                    $ppid = (Get-WmiObject win32_process | Where-Object processid -eq  $pid).parentprocessid
+                    # Set the app name to the Process name of the Parent Pid
+                    $app = (Get-Process -Id $ppid).ProcessName                
+                }
+                else
+                {    
+                    # This is running from a script
+                    $app = $MyInvocation.ScriptName
+                    if ($app)
+                    {
+                        # Set the name to the calling script name if this script is called from another script / function
+                        $app = $MyInvocation.ScriptName.Replace((Split-Path $MyInvocation.ScriptName),'').TrimStart('\')
+                    }
+                    else
+                    {
+                        # If we still cant get the calling script name, we just leave it as "-"
+                        $app = "powershell-$($env:username)"
+                    }
+                }
+	        }
+		
+    		if (!$SessionID)
+	    	{
+		    	$SessionID = $pid
+		    }
+	
+		    if (!$color) {$color = "Blue"}
+		    write-host $logstring -foregroundcolor $color
+		    if ($logfile) 
+		    {
+                $CurrentDateTime = get-date -format "yyyy-MM-ddTHH:mm:ss.ffffffzzz"	
+                $FQDN = $([System.Net.Dns]::GetHostByName(($env:computerName))).Hostname
+                $logstring =  "$Priority$Version $CurrentDateTime $FQDN $app $sessionID [VERBOSE] - $logstring"
+                $logstring | out-file -Filepath $logfile -append -encoding ASCII -ErrorVariable err
+                if ($err)
+                {
+                    write-host "Error !!! failed to write the log to $logfile"
+                    write-host "$err"
+                    return 1
+                }
+            }
+        }            
+	}
+}
+
 
 function log-rotate ()
 {
