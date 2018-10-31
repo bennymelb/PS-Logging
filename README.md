@@ -42,4 +42,12 @@ Import-Module logging -ErrorAction Stop
 
 ```
 
+If you are loading this in a interactive powershell session, assuming you place the module in the current folder
+
+```
+$env:PSModulePath = $env:PSModulePath + ";$pwd"
+import-module ip
+
+```
+
 The .psm file will have to be place inside a folder in the $env:PSModulePath
