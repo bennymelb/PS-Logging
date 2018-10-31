@@ -59,7 +59,7 @@ function log-info()
                 }
                 else
                 {
-                    # If we still cant get the calling script name, we just leave it as "-"
+                    # If we still cant get the calling script name, we put down the username that trigger this script
                     $app = "powershell-$($env:username)"
                 }
             }
@@ -144,7 +144,7 @@ function log-error()
                 }
                 else
                 {
-                    # If we still cant get the calling script name, we just leave it as "-"
+                    # If we still cant get the calling script name, we put down the username that trigger this script
                     $app = "powershell-$($env:username)"
                 }
             }               
@@ -231,7 +231,7 @@ function log-debug()
                     }
                     else
                     {
-                        # If we still cant get the calling script name, we just leave it as "-"
+                        # If we still cant get the calling script name, we put down the username that trigger this script
                         $app = "powershell-$($env:username)"
                     }
                 }
@@ -319,7 +319,7 @@ function log-verbose()
                     }
                     else
                     {
-                        # If we still cant get the calling script name, we just leave it as "-"
+                        # If we still cant get the calling script name, we put down the username that trigger this script
                         $app = "powershell-$($env:username)"
                     }
                 }
@@ -404,7 +404,7 @@ function log-rotate ()
                     $Filename = $file.Name
                     $FileFullPath = $File.FullName
                     Write-Verbose "Working on file $Filename"              
-                    $Counter = 999
+                    $Counter = $Files.count
                     Do
                     {                   
                         $NewCounter = $Counter + 1
