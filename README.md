@@ -6,6 +6,7 @@ For logging, it provide three logging level
 1. Log-Info
 2. Log-Error
 3. Log-Debug
+4. Log-Verbose
 
 Each log level will inject a tag inside the log line to indicate the log level.
 
