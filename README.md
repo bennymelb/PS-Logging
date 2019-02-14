@@ -46,7 +46,7 @@ If you are loading this in a interactive powershell session, assuming you place 
 
 ```
 $env:PSModulePath = $env:PSModulePath + ";$pwd"
-import-module ip
+import-module logging
 
 ```
 
